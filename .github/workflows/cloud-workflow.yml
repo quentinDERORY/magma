@@ -5,14 +5,7 @@ on:  # yamllint disable-line rule:truthy
   push:
     branches:
       - master
-    paths:
-      - 'cwf/cloud/**'
-      - 'fbinternal/cloud/**'
-      - 'feg/cloud/**'
-      - 'lte/cloud/**'
-      - 'orc8r/cloud/**'
-      - 'orc8r/lib/**'
-      - 'wifi/cloud/**'
+      - quentin-slack-notif-reformat
   pull_request:
     branches:
       - master
