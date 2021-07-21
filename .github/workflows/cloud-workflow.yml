@@ -159,7 +159,7 @@ jobs:
       - name: Extract commit title
         if: always()
         env:
-          COMMIT_MESSAGE: ${{github.event.head.commit.message}}
+          COMMIT_MESSAGE: ${{github.event.head_commit.message}}
         run: |
           echo $COMMIT_MESSAGE
           COMMIT_LINES=(${COMMIT_MESSAGE[@]})
