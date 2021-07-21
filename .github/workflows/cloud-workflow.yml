@@ -175,6 +175,10 @@ jobs:
           DOCKER_PASSWORD: "${{ secrets.JFROG_PASSWORD }}"
         run: |
             ./ci-scripts/tag-push-docker.sh --images 'nginx|controller' --tag "${GITHUB_SHA:0:8}" --tag-latest true --project orc8r
+      - name: Extract commit title
+        if: github.ref == 'refs/heads/master'
+        run: |
+          echo COMMIT_TITLE="$(echo $GITHUB_EVENT_HEAD_COMMIT_MESSAGE | head -n 1)"  >> $GITHUB_ENV
       - name: Notify failure to Slack
         if: failure() && github.ref == 'refs/heads/master'
         uses: rtCamp/action-slack-notify@v2.0.2
@@ -183,6 +187,7 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_CI }}
           SLACK_TITLE: "Github action orc8r-build failed"
           SLACK_USERNAME: "Cloud workflow"
+          SLACK_MESSAGE: "{{env.COMMIT_TITLE}}"
           SLACK_ICON_EMOJI: ":boom:"
           SLACK_COLOR: "#FF0000"
       # Notify ci channel when push succeeds
@@ -194,5 +199,6 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_OSS }}
           SLACK_TITLE: "*Orchestrator images have been published*"
           SLACK_USERNAME: "Cloud workflow"
+          SLACK_MESSAGE: "{{env.COMMIT_TITLE}}"
           SLACK_ICON_EMOJI: ":heavy_check_mark:"
           SLACK_COLOR: "#00FF00"
