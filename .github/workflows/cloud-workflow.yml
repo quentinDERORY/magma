@@ -174,7 +174,7 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_TITLE: "Github action orc8r-build failed"
           SLACK_USERNAME: "Cloud workflow"
-          SLACK_MESSAGE: "{{env.COMMIT_TITLE}}"
+          SLACK_MESSAGE: "${{env.COMMIT_TITLE}}"
           SLACK_ICON_EMOJI: ":boom:"
           SLACK_COLOR: "#FF0000"
       # Notify ci channel when push succeeds
