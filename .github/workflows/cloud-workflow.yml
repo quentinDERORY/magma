@@ -6,9 +6,6 @@ on:  # yamllint disable-line rule:truthy
     branches:
       - master
       - quentin-slack-notif-reformat
-  pull_request:
-    branches:
-      - master
 jobs:
   # Fail if checked-in generated code doesn't match output from
   # generation command.
