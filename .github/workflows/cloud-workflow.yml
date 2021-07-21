@@ -16,14 +16,6 @@ on:  # yamllint disable-line rule:truthy
   pull_request:
     branches:
       - master
-    paths:
-      - 'cwf/cloud/**'
-      - 'fbinternal/cloud/**'
-      - 'feg/cloud/**'
-      - 'lte/cloud/**'
-      - 'orc8r/cloud/**'
-      - 'orc8r/lib/**'
-      - 'wifi/cloud/**'
 jobs:
   # Fail if checked-in generated code doesn't match output from
   # generation command.
@@ -141,11 +133,6 @@ jobs:
           SLACK_COLOR: "#FF0000"
   orc8r-build:
     runs-on: ubuntu-latest
-    needs:
-      - insync-checkin
-      - deploy-sync-checkin
-      - cloud-lint
-      - cloud-test
     env:
       MAGMA_ROOT: "${{ github.workspace }}"
       DOCKER_REGISTRY: "${{ secrets.DOCKER_REGISTRY }}"
@@ -176,15 +163,15 @@ jobs:
         run: |
             ./ci-scripts/tag-push-docker.sh --images 'nginx|controller' --tag "${GITHUB_SHA:0:8}" --tag-latest true --project orc8r
       - name: Extract commit title
-        if: github.ref == 'refs/heads/master'
+        if: always()
         run: |
           echo COMMIT_TITLE="$(echo $GITHUB_EVENT_HEAD_COMMIT_MESSAGE | head -n 1)"  >> $GITHUB_ENV
       - name: Notify failure to Slack
-        if: failure() && github.ref == 'refs/heads/master'
+        if: always()
         uses: rtCamp/action-slack-notify@v2.0.2
         # yamllint enable
         env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_CI }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_TITLE: "Github action orc8r-build failed"
           SLACK_USERNAME: "Cloud workflow"
           SLACK_MESSAGE: "{{env.COMMIT_TITLE}}"
