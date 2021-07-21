@@ -133,12 +133,16 @@ jobs:
       DOCKER_PASSWORD: "${{ secrets.DOCKER_PASSWORD }}"
     steps:
       - uses: actions/checkout@v2
+        if: github.ref == 'refs/heads/master'
       - name: Run apt-get update
+        if: github.ref == 'refs/heads/master'
         run: sudo apt-get update
       - uses: actions/setup-python@v2
+        if: github.ref == 'refs/heads/master'
         with:
           python-version: '3.7'
       - name: Run build.py
+        if: github.ref == 'refs/heads/master'
         run: |
             cd ${MAGMA_ROOT}/orc8r/cloud/docker
             python3 build.py --all --nocache --parallel
