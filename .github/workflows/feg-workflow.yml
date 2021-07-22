@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - master
+      - v1.*
     paths:
       - 'orc8r/**'
       - 'lte/**'
@@ -136,24 +137,33 @@ jobs:
         run: |
             cd ${MAGMA_ROOT}/feg/gateway/docker
             python3 build.py -e
+      - name: Set docker tag
+          if: github.event_name == 'push'
+          # yamllint disable rule:line-length
+          run: |
+            if [ "$GITHUB_REF" = "refs/heads/master" ]; then
+               echo TAG="${GITHUB_SHA:0:8}"  >> $GITHUB_ENV
+            else
+              echo TAG="${GITHUB_REF##*/}"  >> $GITHUB_ENV
+            end
       - name: Tag and push to Docker Registry
-        if: github.ref == 'refs/heads/master'
+        if: github.event_name == 'push'
         # yamllint disable rule:line-length
         run: |
-            ./ci-scripts/tag-push-docker.sh --images 'gateway_go|gateway_python' --tag "${GITHUB_SHA:0:8}" --tag-latest true --project feg
+            ./ci-scripts/tag-push-docker.sh --images 'gateway_go|gateway_python' --tag "${TAG}" --tag-latest true --project feg
       - name: Tag and push to Jfrog Registry
-        if: github.ref == 'refs/heads/master'
+        if: github.event_name == 'push'
         env:
           DOCKER_REGISTRY: "${{ secrets.JFROG_DOCKER_ORC8R_REGISTRY }}"
           DOCKER_USERNAME: "${{ secrets.JFROG_USERNAME }}"
           DOCKER_PASSWORD: "${{ secrets.JFROG_PASSWORD }}"
         run: |
-            ./ci-scripts/tag-push-docker.sh --images 'gateway_go|gateway_python' --tag "${GITHUB_SHA:0:8}" --tag-latest true --project feg
+            ./ci-scripts/tag-push-docker.sh --images 'gateway_go|gateway_python' --tag "${TAG}" --tag-latest true --project feg
       # Notify ci channel when failing
       # Plugin info: https://github.com/marketplace/actions/slack-notify
       # yamllint enable
       - name: Notify failure to slack
-        if: failure() && github.ref == 'refs/heads/master'
+        if: failure() && github.event_name == 'push'
         uses: rtCamp/action-slack-notify@v2.0.2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_CI }}
@@ -163,7 +173,7 @@ jobs:
           SLACK_COLOR: "#FF0000"
       # Notify ci channel when push succeeds
       - name: Notify success to slack
-        if: success() && github.ref == 'refs/heads/master'
+        if: success() && github.event_name == 'push'
         uses: rtCamp/action-slack-notify@v2.0.2
         env:
           SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL_ARTIFACTS }}
