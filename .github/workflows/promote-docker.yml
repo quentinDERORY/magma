@@ -1,0 +1,45 @@
+---
+name: promote-docker
+
+on:  # yamllint disable-line rule:truthy
+  workflow_dispatch:
+    inputs:
+      ci_tag:
+        description: 'The tag in the ci repo'
+        required: false
+        default: ''
+      production_tag:
+        description: 'The tag wanted in prodcution repo'
+        required: false
+        default: ''
+jobs:
+  printInputs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set default tags
+        env:
+          CI_TAG: github.event.inputs.ci_tag
+          PRODUCTION_TAG:  github.event.inputs.production_tag
+        run: |
+          if [[ -z $CI_TAG ]]; then
+            echo CI_TAG=${GITHUB_REF##*/}  >> $GITHUB_ENV
+          else
+            echo CI_TAG=${CI_TAG}  >> $GITHUB_ENV
+          fi
+          if [[ -z $PRODUCTION_TAG ]]; then
+            echo PRODUCTION_TAG=${GITHUB_REF##*/}  >> $GITHUB_ENV
+          else
+            echo PRODUCTION_TAG=${PRODUCTION_TAG}  >> $GITHUB_ENV
+          fi
+      - name: Check existence and launch build if absent
+        run: |
+          if [[ -z $CI_TAG ]]; then
+            echo CI_TAG=${GITHUB_REF##*/}  >> $GITHUB_ENV
+          else
+            echo CI_TAG=${CI_TAG}  >> $GITHUB_ENV
+          fi
+          if [[ -z $PRODUCTION_TAG ]]; then
+            echo PRODUCTION_TAG=${GITHUB_REF##*/}  >> $GITHUB_ENV
+          else
+            echo PRODUCTION_TAG=${PRODUCTION_TAG}  >> $GITHUB_ENV
+          fi
