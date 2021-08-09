@@ -35,7 +35,7 @@ VIRT_ENV_PIP_INSTALL := $(BIN)/pip3 install -q -U --cache-dir $(PIP_CACHE_HOME)
 
 install_virtualenv:
 	@echo "Initializing virtualenv with python version $(PYTHON_VERSION)"
-	virtualenv --system-site-packages --python=/usr/bin/python$(PYTHON_VERSION) $(PYTHON_BUILD)
+	virtualenv -v --system-site-packages --python=/usr/bin/python$(PYTHON_VERSION) $(PYTHON_BUILD)
 	. $(PYTHON_BUILD)/bin/activate;
 	$(VIRT_ENV_PIP_INSTALL) "pip>=20.3.2"
 

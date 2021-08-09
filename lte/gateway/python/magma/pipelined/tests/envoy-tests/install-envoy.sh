@@ -7,6 +7,8 @@ sudo apt-get install -y \
 
 sudo curl -sL 'https://getenvoy.io/gpg' | sudo apt-key add -
 
+# Deprecated will fail
+# Replace with https://www.envoyproxy.io/docs/envoy/latest/start/install
 sudo add-apt-repository "deb [arch=amd64] https://dl.bintray.com/tetrate/getenvoy-deb \
 	$(lsb_release -cs) \
 	stable"

@@ -17,8 +17,10 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.require_version ">=1.9.1"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.boot_timeout = 1440
   # Mount magma directory in all VMs
   config.vm.synced_folder "../..", "/home/vagrant/magma"
+
 
   config.vm.define :magma, primary: true do |magma|
     # Get our prepackaged box from the atlas cloud, based on
@@ -46,6 +48,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vb.customize ["modifyvm", :id, "--cpus", "4"]
       vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
       vb.customize ["guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 10000 ]
+    end
+    magma.vm.provider "libvirt" do |vb, override|
+      override.vm.box_version = "1.1.20210326"
     end
     magma.vm.provision "ansible" do |ansible|
       ansible.host_key_checking = false

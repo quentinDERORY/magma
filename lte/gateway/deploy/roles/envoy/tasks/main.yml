@@ -28,6 +28,8 @@
     state: present
   when: preburn
 
+# Deprecated
+# Will have to replace with https://www.envoyproxy.io/docs/envoy/latest/start/install
 - name: Add Getenvoy.io repo
   apt_repository:
     repo: "deb [arch=amd64] https://dl.bintray.com/tetrate/getenvoy-deb/dists stretch stable"

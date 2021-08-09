@@ -64,10 +64,15 @@
 - name: Install pyparsing
   pip:
     name: pyparsing
-    extra_args: --cache-dir $PIP_CACHE_HOME
+    extra_args: --cache-dir ~/.pipcache
     virtualenv_python: python3.5
     virtualenv: /tmp/virtualenv
+  register: pyparsing
+  until: pyparsing is not failed
   when: full_provision
+  retries: 5
+  delay: 3
+  ignore_errors: true
 
 - name: Generate python types from C headers
   command: "/tmp/virtualenv/bin/python3.5 {{ test_scripts }}/c_parser.py"
@@ -99,3 +104,89 @@
     line: "10.0.2.2 controller.magma.test"
     state: present
   when: full_provision
+
+- name: Install setuptools
+  pip:
+    name: setuptools
+    virtualenv_python: python3.5
+    virtualenv: /tmp/virtualenv
+    extra_args: --cache-dir /home/vagrant/magma/.cache/pip -U
+  register: setuptools
+  until: setuptools is not failed
+  retries: 7
+  delay: 3
+
+- name: Install wheel
+  pip:
+    name: wheel
+    virtualenv_python: python3.5
+    virtualenv: /tmp/virtualenv
+    extra_args: --cache-dir /home/vagrant/magma/.cache/pip -U
+  register: wheel
+  until: wheel is not failed
+  retries: 7
+  delay: 3
+
+- name: Install pkg_resources
+  pip:
+    name: pkg_resources
+    virtualenv_python: python3.5
+    virtualenv: /tmp/virtualenv
+    extra_args: --cache-dir /home/vagrant/magma/.cache/pip -U
+  register: pkg_resources
+  until: pkg_resources is not failed
+  retries: 7
+  delay: 3
+
+- name: Install pip
+  pip:
+    name: pip
+    virtualenv_python: python3.5
+    virtualenv: /tmp/virtualenv
+    extra_args: --cache-dir /home/vagrant/magma/.cache/pip -U
+  register: pip
+  until: pip is not failed
+  retries: 7
+  delay: 3
+
+- name: Install grpcio
+  pip:
+    name: grpcio-tools
+    virtualenv_python: python3.5
+    virtualenv: /tmp/virtualenv
+    extra_args: --cache-dir /home/vagrant/magma/.cache/pip -U
+  register: grpcio
+  until: grpcio is not failed
+  retries: 7
+  delay: 3
+
+- name: populate /etc/environment
+  lineinfile:
+    path: "/etc/environment"
+    state: present
+    regexp: "^{{ item.key }}="
+    line: "{{ item.key }}={{ item.value}}"
+  become: true
+  ignore_errors: true
+  loop:
+    - key: PIP_CACHE_HOME
+      value: /home/vagrant/magma/.cache/pip
+    - key: PIP_DEFAULT_TIMEOUT
+      value: 200
+
+
+- name: Change ownership of vagrant home
+  become: yes
+  command: chown -R vagrant /home/vagrant
+  ignore_errors: yes
+
+- name: pre make lte/gateway/python
+  command:
+    cmd: make
+    chdir: /home/vagrant/magma/lte/gateway/python
+  environment:
+    MAGMA_ROOT: "{{ magma_root }}"
+    PIP_CACHE_HOME: /home/vagrant/magma/.cache/pip
+    PIP_DEFAULT_TIMEOUT: 200
+    PYTHON_BUILD: ${MAGMA_ROOT}/build
+  ignore_errors: true

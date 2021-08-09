@@ -108,6 +108,10 @@
     name: setuptools==49.6.0
     state: forcereinstall
     executable: pip3
+  register: setuptools
+  until: setuptools is not failed
+  retries: 5
+  delay: 3
 
 ###########################
 # Install dev dependencies
