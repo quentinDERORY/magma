@@ -81,6 +81,12 @@ variable "eks_worker_group_key" {
   default     = null
 }
 
+variable "eks_worker_ami" {
+  description = "Eks worker amis"
+  type        = string
+  default     = ""
+}
+
 variable "eks_worker_additional_sg_ids" {
   description = "Additional security group IDs to attach to EKS worker nodes."
   type        = list(string)
