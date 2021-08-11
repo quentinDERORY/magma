@@ -32,6 +32,8 @@ resource "helm_release" "external_dns" {
   namespace  = "kube-system"
   keyring    = ""
 
+  timeout = 900
+
   values = [<<VALUES
   rbac:
     create: true

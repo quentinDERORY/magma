@@ -25,6 +25,8 @@ resource "helm_release" "fluentd" {
   version    = "2.3.2"
   keyring    = ""
 
+  timeout = 1900
+
   values = [<<EOT
   replicaCount: 2
   output:

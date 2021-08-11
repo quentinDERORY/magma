@@ -20,6 +20,8 @@ resource "helm_release" "efs_provisioner" {
   namespace  = "kube-system"
   keyring    = ""
 
+  timeout = 900
+
   values = [<<VALUES
   efsProvisioner:
     efsFileSystemId: ${var.efs_file_system_id}
