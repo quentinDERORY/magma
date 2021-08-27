@@ -526,3 +526,8 @@
   command: chown -R vagrant /home/vagrant
   ignore_errors: yes
 
+- name: ansible user
+  ansible.builtin.debug:
+    var: ansible_user
+    verbosity: 2
+
