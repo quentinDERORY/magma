@@ -453,6 +453,11 @@
     dest: /usr/lib/python3/dist-packages/aioeventlet.py
   when: ansible_distribution == "Debian"
 
+- name: Change ownership of vagrant home
+  become: yes
+  command: chown -R vagrant /home/vagrant
+  ignore_errors: yes
+
 - name: Install setuptools
   pip:
     name: setuptools
@@ -463,6 +468,7 @@
   until: setuptools is not failed
   retries: 7
   delay: 3
+  become_user: vagrant
 
 - name: Install wheel
   pip:
@@ -474,6 +480,7 @@
   until: wheel is not failed
   retries: 7
   delay: 3
+  become_user: vagrant
 
 - name: Install pkg_resources
   pip:
@@ -485,6 +492,7 @@
   until: pkg_resources is not failed
   retries: 7
   delay: 3
+  become_user: vagrant
 
 - name: Install pip
   pip:
@@ -496,7 +504,7 @@
   until: pip is not failed
   retries: 7
   delay: 3
-
+  become_user: vagrant
 - name: Install grpcio
   pip:
     name: grpcio-tools
@@ -507,7 +515,27 @@
   until: grpcio is not failed
   retries: 7
   delay: 3
+  become_user: vagrant
+- name: Install aioeventlet
+  pip:
+    name: aioeventlet
+    virtualenv_python: python3.5
+    virtualenv: /tmp/virtualenv
+    extra_args: --cache-dir /home/vagrant/magma/.cache/pip -U
+  register: aioeventlet
+  until: aioeventlet is not failed
+  retries: 7
+  delay: 3
+  ignore_errors: true
+  become_user: vagrant
 
+- name: initialize virtual env
+  command: virtualenv -v --system-site-packages --python=/usr/bin/python3.5 /home/vagrant/build/python
+  ignore_errors: true
+  register: virtual
+  until: virtual is not failed
+  retries: 9
+  delay: 3
 
 - name: populate /etc/environment
   lineinfile:
@@ -521,13 +549,5 @@
       value: /home/vagrant/magma/.cache/pip
     - key: PIP_DEFAULT_TIMEOUT
       value: 200
-- name: Change ownership of vagrant home
-  become: yes
-  command: chown -R vagrant /home/vagrant
-  ignore_errors: yes
 
-- name: ansible user
-  ansible.builtin.debug:
-    var: ansible_user
-    verbosity: 2
 

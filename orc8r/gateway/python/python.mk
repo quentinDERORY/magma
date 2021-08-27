@@ -31,11 +31,11 @@ SITE_PACKAGES_DIR := $(PYTHON_BUILD)/lib/python$(PYTHON_VERSION)/site-packages
 PATCHES_DIR := $(SRC)/lte/gateway/deploy/roles/magma/files/patches
 
 # Command to pip install into the virtualenv
-VIRT_ENV_PIP_INSTALL := $(BIN)/pip3 install -q -U --cache-dir $(PIP_CACHE_HOME) --no-seed
+VIRT_ENV_PIP_INSTALL := $(BIN)/pip3 install -q -U --cache-dir $(PIP_CACHE_HOME)
 
 install_virtualenv:
 	@echo "Initializing virtualenv with python version $(PYTHON_VERSION)"
-	virtualenv -v --system-site-packages --python=/usr/bin/python$(PYTHON_VERSION) $(PYTHON_BUILD)
+	virtualenv -v  --no-pip --no-setuptools --no-wheel --system-site-packages --python=/usr/bin/python$(PYTHON_VERSION) $(PYTHON_BUILD)
 	. $(PYTHON_BUILD)/bin/activate;
 	$(VIRT_ENV_PIP_INSTALL) "pip>=20.3.2"
 
