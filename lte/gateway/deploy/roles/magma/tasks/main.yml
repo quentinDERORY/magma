@@ -526,13 +526,3 @@
   command: chown -R vagrant /home/vagrant
   ignore_errors: yes
 
-- name: pre make lte/gateway/python
-  command:
-    cmd: make
-    chdir: /home/vagrant/magma/lte/gateway
-  environment:
-    MAGMA_ROOT: "{{ magma_root }}"
-    PIP_CACHE_HOME: /home/vagrant/magma/.cache/pip
-    PIP_DEFAULT_TIMEOUT: 200
-    PYTHON_BUILD: ${MAGMA_ROOT}/build
-  ignore_errors: true
