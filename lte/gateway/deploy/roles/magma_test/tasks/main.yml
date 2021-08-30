@@ -206,3 +206,8 @@
   until: virtual is not failed
   retries: 9
   delay: 3
+
+- name: Change ownership of vagrant home
+  become: yes
+  command: chown -R vagrant /home/vagrant
+  ignore_errors: yes
