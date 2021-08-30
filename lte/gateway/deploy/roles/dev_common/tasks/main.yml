@@ -18,7 +18,6 @@
   when: preburn
 
 - name: Install ansible for Ubuntu systems
-  when: preburn and ansible_distribution == "Ubuntu"
   apt:
     state: present
     pkg:
