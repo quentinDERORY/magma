@@ -67,7 +67,7 @@ TEST(test_s1ap_handle_new_association, shutdown) {
         .instreams     = 0,
         .outstreams    = 0,
         .assoc_id      = 1,
-        .ran_cp_ipaddr = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0",
+        .ran_cp_ipaddr = bfromcstr("\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"),
     };
   EXPECT_EQ(s1ap_handle_new_association(s, &p), RETURNok);
 
@@ -92,7 +92,7 @@ TEST(test_s1ap_handle_new_association, resetting) {
           .instreams     = 0,
           .outstreams    = 0,
           .assoc_id      = 1,
-          .ran_cp_ipaddr = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0",
+          .ran_cp_ipaddr = bfromcstr("\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"),
       };
   EXPECT_EQ(s1ap_handle_new_association(s, &p), RETURNok);
 
@@ -117,7 +117,7 @@ TEST(test_s1ap_handle_new_association, reassociate) {
           .instreams     = 0,
           .outstreams    = 0,
           .assoc_id      = 1,
-          .ran_cp_ipaddr = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0",
+          .ran_cp_ipaddr = bfromcstr("\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"),
       };
   EXPECT_EQ(s1ap_handle_new_association(s, &p), RETURNok);
 
