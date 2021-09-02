@@ -28,6 +28,7 @@ sed -i '/20190801T025637Z/d' /etc/apt/sources.list
 # Install some packages
 apt-get update
 apt-get install -y openssh-server gcc rsync dirmngr
+apt-get install -y apt-transport-https ca-certificates
 
 # Add the Etagecom magma repo
 bash -c 'echo -e "deb https://artifactory.magmacore.org/artifactory/debian-test stretch-1.5.0 main" > /etc/apt/sources.list.d/packages_magma_etagecom_io.list'
