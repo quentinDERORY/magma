@@ -602,10 +602,10 @@
       value: /home/vagrant/magma/.cache/pip
     - key: PIP_DEFAULT_TIMEOUT
       value: 200
-- name: update ccache
+- name: update build-essential
   apt:
     state: present
-    pkg: ccache
+    pkg: build-essential
   retries: 5
 
 - name: Change ownership of vagrant home

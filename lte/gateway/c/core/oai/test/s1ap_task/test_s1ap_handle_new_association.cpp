@@ -63,12 +63,7 @@ TEST(test_s1ap_handle_new_association, empty_initial_state) {
 
 TEST(test_s1ap_handle_new_association, shutdown) {
   s1ap_state_t* s   = create_s1ap_state(2, 2);
-    sctp_new_peer_t p     = {
-        .instreams     = 0,
-        .outstreams    = 0,
-        .assoc_id      = 1,
-        .ran_cp_ipaddr = bfromcstr("\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"),
-    };
+  sctp_new_peer_t p = {.assoc_id = 1};
   EXPECT_EQ(s1ap_handle_new_association(s, &p), RETURNok);
 
   // set enb to shutdown state
@@ -88,12 +83,7 @@ TEST(test_s1ap_handle_new_association, shutdown) {
 
 TEST(test_s1ap_handle_new_association, resetting) {
   s1ap_state_t* s   = create_s1ap_state(2, 2);
-      sctp_new_peer_t p     = {
-          .instreams     = 0,
-          .outstreams    = 0,
-          .assoc_id      = 1,
-          .ran_cp_ipaddr = bfromcstr("\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"),
-      };
+  sctp_new_peer_t p = {.assoc_id = 1};
   EXPECT_EQ(s1ap_handle_new_association(s, &p), RETURNok);
 
   // set enb to shutdown state
@@ -113,12 +103,7 @@ TEST(test_s1ap_handle_new_association, resetting) {
 
 TEST(test_s1ap_handle_new_association, reassociate) {
   s1ap_state_t* s   = create_s1ap_state(2, 2);
-      sctp_new_peer_t p     = {
-          .instreams     = 0,
-          .outstreams    = 0,
-          .assoc_id      = 1,
-          .ran_cp_ipaddr = bfromcstr("\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"),
-      };
+  sctp_new_peer_t p = {.assoc_id = 1};
   EXPECT_EQ(s1ap_handle_new_association(s, &p), RETURNok);
 
   // make sure first association worked
