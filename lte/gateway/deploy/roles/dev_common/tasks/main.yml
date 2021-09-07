@@ -260,9 +260,21 @@
   retries: 5
   when: preburn
 
+- name: Install Debian Magma gateway dev dependencies
+  retries: 5
+  when: preburn and ansible_distribution == "Debian"
+  apt:
+    state: present
+    update_cache: no
+    pkg:
+      - libprotobuf10
+      - libprotobuf-lite10
+      - libprotoc10
+      - libssl1.0-dev
+
 - name: Install Ubuntu Magma gateway dev dependencies
   retries: 5
-  when: preburn
+  when: preburn and ansible_distribution == "Ubuntu"
   apt:
     state: present
     update_cache: no
