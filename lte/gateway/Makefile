@@ -75,6 +75,7 @@ build: build_python build_common build_oai build_sctpd build_session_manager bui
 smf_build: build_session_manager  ## Build only sessionD component make smf_build
 
 test: test_python test_common test_oai test_sctpd test_session_manager ## Run all tests
+    export INTEG_TESTS=true
 
 clean: clean_python clean_envoy_controller ## Clean all builds
 	rm -rf $(C_BUILD)

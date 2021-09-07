@@ -37,7 +37,9 @@ install_virtualenv:
 	@echo "Initializing virtualenv with python version $(PYTHON_VERSION)"
 	virtualenv -v  --no-pip --no-setuptools --no-wheel --system-site-packages --python=/usr/bin/python$(PYTHON_VERSION) $(PYTHON_BUILD)
 	. $(PYTHON_BUILD)/bin/activate;
-	$(VIRT_ENV_PIP_INSTALL) "pip>=20.3.2"
+	ifndef INTEG_TESTS
+	    $(VIRT_ENV_PIP_INSTALL) "pip>=20.3.2"
+    endif
 
 setupenv: $(PYTHON_BUILD)/sysdeps $(SITE_PACKAGES_DIR)/setuptools
 
@@ -51,7 +53,9 @@ $(PYTHON_BUILD):
 	mkdir -p $(PYTHON_BUILD)
 
 $(SITE_PACKAGES_DIR)/setuptools: install_virtualenv
-	$(VIRT_ENV_PIP_INSTALL) "setuptools==49.6.0"  # newer than 41.0.1
+    ifndef INTEG_TESTS
+	    $(VIRT_ENV_PIP_INSTALL) "setuptools==49.6.0"  # newer than 41.0.1
+	endif
 
 py_patches:
 	patch --dry-run -N -s -f $(SITE_PACKAGES_DIR)/aioeventlet.py <$(PATCHES_DIR)/aioeventlet.py38.patch 2>/dev/null \
@@ -66,7 +70,9 @@ py_patches:
 	&&  (patch -N -s -f $(SITE_PACKAGES_DIR)/ryu/ofproto/nx_actions.py <$(PATCHES_DIR)/0001-Set-unknown-dpid-ofctl-log-to-debug.patch && echo "ryu was patched" ) \
 	|| ( true && echo "skipping ryu patch since it was already applied")
 
-	$(VIRT_ENV_PIP_INSTALL) --force-reinstall git+https://github.com/URenko/aioh2.git
+    ifndef INTEG_TESTS
+	    $(VIRT_ENV_PIP_INSTALL) --force-reinstall git+https://github.com/URenko/aioh2.git
+	endif
 
 swagger:: swagger_prereqs $(SWAGGER_LIST)
 swagger_prereqs:
@@ -112,7 +118,9 @@ prometheus_proto:
 
 # If you update the version here, you probably also want to update it in setup.py
 $(BIN)/grpcio-tools: install_virtualenv
-	$(VIRT_ENV_PIP_INSTALL) "grpcio-tools>=1.16.1"
+    ifndef INTEG_TESTS
+	    $(VIRT_ENV_PIP_INSTALL) "grpcio-tools>=1.16.1"
+	endif
 
 .test: .tests .sudo_tests
 
