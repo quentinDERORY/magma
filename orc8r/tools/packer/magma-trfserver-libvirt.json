@@ -44,8 +44,8 @@
       "disk_compression": true,
       "accelerator": "kvm",
       "qemuargs": [
-        [ "-smp", "{{ user `cpus` }}" ],
-        [ "-m", "{{ user `memory` }}M" ]
+        [ "-smp", "2" ],
+        [ "-m", "2048M" ]
       ],
       "vm_name": "magma-tfserver"
     }
