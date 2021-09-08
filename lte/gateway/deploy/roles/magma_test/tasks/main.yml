@@ -239,6 +239,8 @@
       value: /home/vagrant/magma/.cache/pip
     - key: PIP_DEFAULT_TIMEOUT
       value: 200
+    - key: PYTHONPATH
+      value: $PYTHONPATH:/tmp/virtualenv/lib/python3.5/site-packages:/usr/lib/python3/dist-packages
 
 - name: initialize virtual env
   command: virtualenv -v --system-site-packages --python=/usr/bin/python3.5 /home/vagrant/build/python
