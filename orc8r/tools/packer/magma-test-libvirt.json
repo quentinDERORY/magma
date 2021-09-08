@@ -27,8 +27,6 @@
         "<enter><wait>"
       ],
       "boot_wait": "5s",
-      "guest_additions_mode": "upload",
-      "guest_os_type": "ubuntu-64",
       "headless": true,
       "http_directory": "http",
       "iso_checksum": "sha256:f11bda2f2caed8f420802b59f382c25160b114ccc665dbac9c5046e7fceaced2",
@@ -40,32 +38,17 @@
       "ssh_password": "vagrant",
       "ssh_timeout": "64206s",
       "ssh_username": "vagrant",
-      "type": "virtualbox-iso",
-      "vboxmanage": [
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--memory",
-          "2048"
-        ],
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--cpus",
-          "2"
-        ]
+      "type": "qemu",
+      "format": "qcow2",
+      "skip_compaction": false,
+      "disk_compression": true,
+      "accelerator": "kvm",
+      "qemuargs": [
+        [ "-smp", "{{ user `cpus` }}" ],
+        [ "-m", "{{ user `memory` }}M" ]
       ],
-      "virtualbox_version_file": ".vbox_version",
-      "vm_name": "packer-ubuntu-20.04-amd64"
+      "vm_name": "magma-test"
     }
-  ],
-  "post-processors": [
-    [
-      {
-        "output": "builds/magma_dev_focal_{{.Provider}}.box",
-        "type": "vagrant"
-      }
-    ]
   ],
   "provisioners": [
     {
@@ -121,7 +104,7 @@
         "../../../lte/gateway/deploy/roles/uselocalpkgrepo"
       ],
       "extra_arguments": [
-        "-vvvv --extra-vars '{\"ansible_user\": \"vagrant\", \"preburn\": true, \"full_provision\": false, \"ansible_distribution\": \"Debian\"}'"
+        "-vvvv --extra-vars '{\"ansible_user\": \"vagrant\", \"preburn\": true, \"full_provision\": false, \"ansible_distribution\": \"Ubuntu\"}'"
       ]
     }
   ],
