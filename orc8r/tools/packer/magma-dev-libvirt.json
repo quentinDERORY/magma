@@ -39,8 +39,6 @@
       "ssh_timeout": "64206s",
       "ssh_username": "vagrant",
       "type": "qemu",
-      "skip_compaction": false,
-      "disk_compression": true,
       "accelerator": "kvm",
       "qemuargs": [
         [ "-smp", "2" ],
