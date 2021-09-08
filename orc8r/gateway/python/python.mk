@@ -38,8 +38,10 @@ install_virtualenv:
 	virtualenv -v  --no-pip --no-setuptools --no-wheel --system-site-packages --python=/usr/bin/python$(PYTHON_VERSION) $(PYTHON_BUILD)
 	. $(PYTHON_BUILD)/bin/activate;
 ifndef INTEG_TESTS
-    $(VIRT_ENV_PIP_INSTALL) "pip>=20.3.2"
+	$(VIRT_ENV_PIP_INSTALL) "pip>=20.3.2"
 endif
+
+
 
 setupenv: $(PYTHON_BUILD)/sysdeps $(SITE_PACKAGES_DIR)/setuptools
 
@@ -54,7 +56,7 @@ $(PYTHON_BUILD):
 
 $(SITE_PACKAGES_DIR)/setuptools: install_virtualenv
 ifndef INTEG_TESTS
-    $(VIRT_ENV_PIP_INSTALL) "setuptools==49.6.0"  # newer than 41.0.1
+	$(VIRT_ENV_PIP_INSTALL) "setuptools==49.6.0"  # newer than 41.0.1
 endif
 
 py_patches:
@@ -71,7 +73,7 @@ py_patches:
 	|| ( true && echo "skipping ryu patch since it was already applied")
 
 ifndef INTEG_TESTS
-    $(VIRT_ENV_PIP_INSTALL) --force-reinstall git+https://github.com/URenko/aioh2.git
+	$(VIRT_ENV_PIP_INSTALL) --force-reinstall git+https://github.com/URenko/aioh2.git
 endif
 
 swagger:: swagger_prereqs $(SWAGGER_LIST)
@@ -119,7 +121,7 @@ prometheus_proto:
 # If you update the version here, you probably also want to update it in setup.py
 $(BIN)/grpcio-tools: install_virtualenv
 ifndef INTEG_TESTS
-    $(VIRT_ENV_PIP_INSTALL) "grpcio-tools>=1.16.1"
+	$(VIRT_ENV_PIP_INSTALL) "grpcio-tools>=1.16.1"
 endif
 
 .test: .tests .sudo_tests
