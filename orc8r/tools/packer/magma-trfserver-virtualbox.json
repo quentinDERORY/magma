@@ -70,7 +70,7 @@
         "../../../lte/gateway/deploy/roles/stretch_snapshot"
       ],
       "extra_arguments": [
-        "--extra-vars '{\"ansible_user\": \"vagrant\", \"preburn\": true, \"full_provision\": false}'"
+        "-v --extra-vars '{\"ansible_user\": \"vagrant\", \"preburn\": true, \"full_provision\": false}'"
       ]
     }
   ],

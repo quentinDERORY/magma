@@ -324,20 +324,20 @@
   get_url:
     url: "https://github.com/getsentry/sentry-native/releases/download/{{ sentry_native_version }}/sentry-native.zip"
     dest: "{{ tmp_directory }}/sentry-native.zip"
-  when: preburn
+  when: preburn and ansible_distribution == "Ubuntu"
 
 - name: Create a directory for Sentry Native
   file:
     path: "{{ tmp_directory }}/sentry-native"
     state: directory
-  when: preburn
+  when: preburn and ansible_distribution == "Ubuntu"
 
 - name: Unpack Sentry Native SDK
   unarchive:
     src: "{{ tmp_directory }}/sentry-native.zip"
     dest: "{{ tmp_directory }}/sentry-native"
     remote_src: yes
-  when: preburn
+  when: preburn and ansible_distribution == "Ubuntu"
 
 - name: Build and Install Sentry Native SDK
   shell: |
@@ -346,7 +346,7 @@
     cmake --build build --parallel && \
     cmake --install build --prefix install --config RelWithDebInfo && \
     cd build && make install
-  when: preburn
+  when: preburn and ansible_distribution == "Ubuntu"
 
 ###############################################
 # Download and build swagger-codegen
