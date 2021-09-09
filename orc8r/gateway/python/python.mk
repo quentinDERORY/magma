@@ -37,9 +37,7 @@ install_virtualenv:
 	@echo "Initializing virtualenv with python version $(PYTHON_VERSION)"
 	virtualenv -v  --no-pip --no-setuptools --no-wheel --system-site-packages --python=/usr/bin/python$(PYTHON_VERSION) $(PYTHON_BUILD)
 	. $(PYTHON_BUILD)/bin/activate;
-ifndef INTEG_TESTS
 	$(VIRT_ENV_PIP_INSTALL) "pip>=20.3.2"
-endif
 
 
 
@@ -55,9 +53,7 @@ $(PYTHON_BUILD):
 	mkdir -p $(PYTHON_BUILD)
 
 $(SITE_PACKAGES_DIR)/setuptools: install_virtualenv
-ifndef INTEG_TESTS
 	$(VIRT_ENV_PIP_INSTALL) "setuptools==49.6.0"  # newer than 41.0.1
-endif
 
 py_patches:
 	patch --dry-run -N -s -f $(SITE_PACKAGES_DIR)/aioeventlet.py <$(PATCHES_DIR)/aioeventlet.py38.patch 2>/dev/null \
