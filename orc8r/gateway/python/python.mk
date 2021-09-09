@@ -72,9 +72,8 @@ py_patches:
 	&&  (patch -N -s -f $(SITE_PACKAGES_DIR)/ryu/ofproto/nx_actions.py <$(PATCHES_DIR)/0001-Set-unknown-dpid-ofctl-log-to-debug.patch && echo "ryu was patched" ) \
 	|| ( true && echo "skipping ryu patch since it was already applied")
 
-ifndef INTEG_TESTS
 	$(VIRT_ENV_PIP_INSTALL) --force-reinstall git+https://github.com/URenko/aioh2.git
-endif
+
 
 swagger:: swagger_prereqs $(SWAGGER_LIST)
 swagger_prereqs:
@@ -120,9 +119,7 @@ prometheus_proto:
 
 # If you update the version here, you probably also want to update it in setup.py
 $(BIN)/grpcio-tools: install_virtualenv
-ifndef INTEG_TESTS
 	$(VIRT_ENV_PIP_INSTALL) "grpcio-tools>=1.16.1"
-endif
 
 .test: .tests .sudo_tests
 
