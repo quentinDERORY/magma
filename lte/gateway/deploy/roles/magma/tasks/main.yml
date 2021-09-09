@@ -590,6 +590,16 @@
   retries: 9
   delay: 3
 
+- name: populate virtual env activate
+  lineinfile:
+    path: "/home/vagrant/build/python/bin/activate"
+    state: present
+    line: "export {{ item.key }}={{ item.value}}"
+  ignore_errors: true
+  loop:
+    - key: PYTHONPATH
+      value: $PYTHONPATH:/tmp/virtualenv/lib/python3.5/site-packages:/usr/lib/python3/dist-packages
+
 - name: populate /etc/environment
   lineinfile:
     path: "/etc/environment"
