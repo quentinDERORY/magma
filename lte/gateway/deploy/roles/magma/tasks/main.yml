@@ -590,6 +590,14 @@
   retries: 9
   delay: 3
 
+- name: Setup coreutils
+  apt:
+    pkg: coreutils
+    state: present
+    update_cache: yes
+  retries: 5
+  ignore_errors: true
+
 - name: populate virtual env activate
   lineinfile:
     path: "/home/vagrant/build/python/bin/activate"

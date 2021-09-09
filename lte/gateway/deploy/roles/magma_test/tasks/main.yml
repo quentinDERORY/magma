@@ -224,6 +224,14 @@
   ignore_errors: true
   become_user: vagrant
 
+- name: Setup coreutils
+  apt:
+    pkg: coreutils
+    state: present
+    update_cache: yes
+  retries: 5
+  ignore_errors: true
+
 
 
 - name: populate /etc/environment
