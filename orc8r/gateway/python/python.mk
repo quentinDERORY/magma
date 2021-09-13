@@ -51,7 +51,6 @@ $(PYTHON_BUILD):
 	mkdir -p $(PYTHON_BUILD)
 
 $(SITE_PACKAGES_DIR)/setuptools: install_virtualenv
-	$(VIRT_ENV_PIP_INSTALL) "setuptools==49.6.0"  # newer than 41.0.1
 
 py_patches:
 	patch --dry-run -N -s -f $(SITE_PACKAGES_DIR)/aioeventlet.py <$(PATCHES_DIR)/aioeventlet.py38.patch 2>/dev/null \
