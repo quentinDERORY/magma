@@ -21,6 +21,7 @@
 - name: Check Linux distribution version
   fail: msg="Unsupported host OS {{ ansible_distribution }} {{ ansible_distribution_release }}. Must be Debian 9 (Stretch)"
   when: ansible_distribution != 'Debian' or ansible_distribution_release != 'stretch'
+  ignore_errors: true
 
 - name: Create symlink for trfserver scripts
   file:
