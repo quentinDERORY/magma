@@ -426,17 +426,33 @@
     state: directory
     mode: 0777
 
+- name: Create the file
+  command: touch /etc/multipath.conf
+  become: yes
+  ignore_errors: true
+
 - name: Patch multipath conf
   when: preburn
   patch:
     src: patches/multipath-conf.patch
     dest: /etc/multipath.conf
+  become: yes
+  ignore_errors: true
 
 - name: Copy Interface file.
   copy:
     src: magma_interfaces
     dest: /etc/network/interfaces
   when: preburn
+  ignore_errors: true
+
+
+- name: Copy Interface file.
+  copy:
+    src: magma_interfaces
+    dest: /etc/network/interfaces
+  when: preburn
+  become: yes
 
 - name: Remove netplan and enable networking.
   shell: |
