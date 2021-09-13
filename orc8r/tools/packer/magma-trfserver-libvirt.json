@@ -77,8 +77,7 @@
       "playbook_file": "../../../lte/gateway/deploy/magma_trfserver.yml",
       "inventory_groups": "trfserver",
       "role_paths": [
-        "../../../lte/gateway/deploy/roles/trfserver",
-        "../../../lte/gateway/deploy/roles/stretch_snapshot"
+        "../../../lte/gateway/deploy/roles/trfserver"
       ],
       "extra_arguments": [
         "-v --extra-vars '{\"ansible_user\": \"vagrant\", \"preburn\": true, \"full_provision\": false, \"ansible_distribution\": \"Ubuntu\"}'"
