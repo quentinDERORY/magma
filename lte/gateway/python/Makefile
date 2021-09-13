@@ -20,7 +20,7 @@ $(TEST_LIST): %_test:
 	make -C $* .test
 
 coverage: $(BIN)/coverage
-	$(SITE_PACKAGES_DIR)/coverage report
+	coverage report
 
 $(BIN)/nosetests: install_virtualenv
 	$(VIRT_ENV_PIP_INSTALL) -I nose==1.3.7
