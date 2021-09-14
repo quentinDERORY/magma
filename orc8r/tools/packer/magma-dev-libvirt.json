@@ -74,7 +74,7 @@
     },
     {
       "type": "ansible-local",
-      "playbook_file": "../../../lte/gateway/deploy/magma_dev.yml",
+      "playbook_file": "../../../lte/gateway/deploy/magma_dev_focal.yml",
       "inventory_groups": "dev",
       "role_paths": [
         "../../../orc8r/tools/ansible/roles/apt_cache",
