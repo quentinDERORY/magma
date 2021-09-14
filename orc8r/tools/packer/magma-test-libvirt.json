@@ -110,7 +110,7 @@
   "post-processors": [
     [
       {
-        "output": "builds/magma_test_{{.Provider}}.box",
+        "output": "builds/magma-test-{{.Provider}}.box",
         "type": "vagrant"
       },
       {

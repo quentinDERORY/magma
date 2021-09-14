@@ -77,7 +77,7 @@
   "post-processors": [
     [
       {
-        "output": "builds/magma_trfserver_{{.Provider}}.box",
+        "output": "builds/magma-trfserver-{{.Provider}}.box",
         "type": "vagrant"
       },
       {
