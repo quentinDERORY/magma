@@ -51,13 +51,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
     magma.vm.provider "libvirt" do |vb, override|
       override.vm.box_version = "1.1.20210914"
+      override.vm.network "private_network",
+        ip: "192.168.60.142", nic_type: "virtio",
+        libvirt__guest_ipv6: "no",
+       libvirt__driver_name: "qemu",
+       libvirt__forward_mode: "open"
       override.vm.network :private_network,
-        :type => "dhcp",
-        :libvirt__network_address => '192.168.60.142'
-      override.vm.network :private_network,
-          :type => "dhcp",
-          :libvirt__network_address => '192.168.129.1',
-          :nic_type => "82540EM"
+          ip: "192.168.129.1", nic_type: "virtio",
+          libvirt__guest_ipv6: "no",
+          libvirt__driver_name: "qemu",
+         libvirt__forward_mode: "open"
     end
     magma.vm.provision "ansible" do |ansible|
       ansible.host_key_checking = false
