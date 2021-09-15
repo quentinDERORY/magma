@@ -35,11 +35,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     
     magma.vbguest.auto_update = false
 
-    # Create a private network, which allows host-only access to the machine
-    # using a specific IP.
-    magma.vm.network "private_network", ip: "192.168.60.142", nic_type: "82540EM"
-    # iperf3 trfserver routable IP.
-    magma.vm.network "private_network", ip: "192.168.129.1", nic_type: "82540EM"
 
     magma.vm.provider "virtualbox" do |vb|
       vb.name = "magma-dev"
@@ -52,15 +47,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     magma.vm.provider "libvirt" do |vb, override|
       override.vm.box_version = "1.1.20210914"
       override.vm.network "private_network",
-        ip: "192.168.60.142", nic_type: "virtio",
+        ip: "192.168.60.142", nic_type: "e1000",
         libvirt__guest_ipv6: "no",
        libvirt__driver_name: "qemu",
-       libvirt__forward_mode: "open"
+       libvirt__forward_mode: "open",
+       autostart: "true",
+     libvirt__dhcp_enabled: "false"
       override.vm.network :private_network,
-          ip: "192.168.129.1", nic_type: "virtio",
+          ip: "192.168.129.1", nic_type: "e1000",
           libvirt__guest_ipv6: "no",
           libvirt__driver_name: "qemu",
-         libvirt__forward_mode: "open"
+         libvirt__forward_mode: "open",
+         autostart: "true",
+         libvirt__dhcp_enabled: "false"
     end
     magma.vm.provision "ansible" do |ansible|
       ansible.host_key_checking = false
