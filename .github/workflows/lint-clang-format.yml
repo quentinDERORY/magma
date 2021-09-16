@@ -1,5 +1,5 @@
 ---
-name: lint-clang-format
+name: lint-clang-formats
 on:  # yamllint disable-line rule:truthy
   pull_request:
     types:
