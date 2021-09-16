@@ -19,6 +19,7 @@ jobs:
     outputs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
+      - uses: hmarr/debug-action@v2
       - id: skip_check
         uses: fkirc/skip-duplicate-actions@master
         with:
