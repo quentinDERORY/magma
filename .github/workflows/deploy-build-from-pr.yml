@@ -1,0 +1,150 @@
+---
+
+name: Deploy PR build
+on:  # yamllint disable-line rule:truthy
+  workflow_run:
+    workflows:
+      - agw-workflow
+      - nms-workflow
+      - cloud-workflow
+      - cwag-workflow
+      - cwf-operator
+      - feg-workflow
+      - Push Helm Charts to Artifactory
+    types:
+      - completed
+# Replace registries with new test registries reserved for PR builds
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    env:
+      WORKFLOW_NAME: "${{ github.event.workflow.name }}"
+      WORKFLOW_STATUS: "${{ github.event.workflow_run.conclusion }}"
+    steps:
+      # Retrieve Generated artifacts and delete them to keep cache usage low
+      - name: 'Download artifacts'
+        uses: actions/github-script@v3.1.0
+        with:
+          script: |
+            var artifacts = await github.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: ${{github.event.workflow_run.id }},
+            });
+            var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
+              return (artifact.name == "magma-packages" || artifact.name == "docker-images" || artifact.name == "helm-charts")
+            })[0];
+            var download = await github.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id,
+               archive_format: 'zip',
+            });
+            var fs = require('fs');
+            fs.writeFileSync('${{github.workspace}}/artifacts.zip', Buffer.from(download.data));
+            github.actions.deleteArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id
+            });
+      - run: unzip artifacts.zip
+      - name: upload to artifactory
+        if: ${{ github.event.workflow.name == 'agw-workflow' }}
+        run: |
+          for i in `ls -a1 *.deb`
+          do
+            echo "Pushing package $i to JFROG artifiactory: https://artifactory.magmacore.org/artifactory/debian-test/pool"
+            curl -uci-bot:${{ secrets.JFROG_CIBOT_APIKEYS }} -XPUT "https://artifactory.magmacore.org/artifactory/debian-test/pool/focal-ci/$i;deb.distribution=focal-ci;deb.component=main;deb.architecture=amd64" -T $i
+          done
+      - name: extract images
+        if: ${{ github.event.workflow.name == 'nms-workflow' || github.event.workflow.name == 'cloud-workflow' ||  github.event.workflow.name == 'feg-workflow'  ||  github.event.workflow.name == 'cwf-operator'   ||  github.event.workflow.name == 'cwag-workfow'}}
+        run: |
+          gzip --extract *.zip
+      - name: Tag and push to Jfrog Registry
+        if: github.event.workflow.name == 'nms-workflow'
+        env:
+          DOCKER_REGISTRY: "orc8r-test.artifactory.magmacore.org"
+          DOCKER_USERNAME: "${{ secrets.JFROG_USERNAME }}"
+          DOCKER_PASSWORD: "${{ secrets.JFROG_PASSWORD }}"
+        run: |
+          docker image import magmalte.tar magmalte:latest
+          ./ci-scripts/tag-push-docker.sh --images 'magmalte' --tag "${GITHUB_SHA:0:8}" --tag-latest true
+      - name: Tag and push to Jfrog Registry
+        if: github.event.workflow.name == 'cloud-workflow'
+        env:
+          DOCKER_REGISTRY: "orc8r-test.artifactory.magmacore.org"
+          DOCKER_USERNAME: "${{ secrets.JFROG_USERNAME }}"
+          DOCKER_PASSWORD: "${{ secrets.JFROG_PASSWORD }}"
+        run: |
+          docker image import nginx.tar nginx:latest
+          docker image import controller.tar controller:latest
+          ./ci-scripts/tag-push-docker.sh --images 'nginx|controller' --tag "${GITHUB_SHA:0:8}" --tag-latest true
+      - name: Tag and push to Jfrog Registry
+        if: github.event.workflow.name == 'cwf-operator'
+        env:
+          DOCKER_REGISTRY: "orc8r-test.artifactory.magmacore.org"
+          DOCKER_USERNAME: "${{ secrets.JFROG_USERNAME }}"
+          DOCKER_PASSWORD: "${{ secrets.JFROG_PASSWORD }}"
+        run: |
+          docker image import operator.tar operator:latest
+          ./ci-scripts/tag-push-docker.sh --images 'operator' --tag "${GITHUB_SHA:0:8}" --tag-latest true
+      - name: Tag and push to Jfrog Registry
+        if: github.event.workflow.name == 'cwag-workflow'
+        env:
+          DOCKER_REGISTRY: "orc8r-test.artifactory.magmacore.org"
+          DOCKER_USERNAME: "${{ secrets.JFROG_USERNAME }}"
+          DOCKER_PASSWORD: "${{ secrets.JFROG_PASSWORD }}"
+        run: |
+          docker image import cwag_go.tar cwag_go:latest
+          docker image import gateway_go.tar gateway_go:latest
+          docker image import gateway_python.tar gateway_python:latest
+          docker image import gateway_sessiond.tar gateway_sessiond:latest
+          docker image import gateway_pipelined.tar gateway_pipelined:latest
+          ./ci-scripts/tag-push-docker.sh --images 'cwag_go|gateway_go|gateway_python|gateway_sessiond|gateway_pipelined' --tag "${GITHUB_SHA:0:8}" --tag-latest true
+      - name: Tag and push to Jfrog Registry
+        if: github.event.workflow.name == 'feg-workflow'
+        env:
+          DOCKER_REGISTRY: "orc8r-test.artifactory.magmacore.org"
+          DOCKER_USERNAME: "${{ secrets.JFROG_USERNAME }}"
+          DOCKER_PASSWORD: "${{ secrets.JFROG_PASSWORD }}"
+        run: |
+          docker image import gateway_go.tar gateway_go:latest
+          docker image import gateway_python.tar gateway_python:latest
+          ./ci-scripts/tag-push-docker.sh --images 'gateway_go|gateway_python' --tag "${GITHUB_SHA:0:8}" --tag-latest true
+      - name: Push Helm charts and verify the push
+        if: github.event.workflow.name == 'Push Helm Charts to Artifactory'
+        env:
+          HELM_CHART_ARTIFACTORY_URL: "https://artifactory.magmacore.org:443/artifactory/"
+          HELM_CHART_MUSEUM_REPO: helm-test
+          HELM_CHART_MUSEUM_USERNAME: "${{ secrets.HELM_CHART_MUSEUM_USERNAME }}"
+          HELM_CHART_MUSEUM_TOKEN: "${{ secrets.HELM_CHART_MUSEUM_TOKEN }}"
+        run: |
+          for ARTIFACT_PATH in `ls -a1 *.tgz`
+          do
+            MD5_CHECKSUM="$(md5sum "$ARTIFACT_PATH" | awk '{print $1}')"
+            SHA1_CHECKSUM="$(shasum -a 1 "$ARTIFACT_PATH" | awk '{ print $1 }')"
+            SHA256_CHECKSUM="$(shasum -a 256 "$ARTIFACT_PATH" | awk '{ print $1 }')"
+            curl --user "$HELM_CHART_MUSEUM_USERNAME":"$HELM_CHART_MUSEUM_TOKEN" --fail \
+            --header "X-Checksum-MD5:${MD5_CHECKSUM}" \
+            --header "X-Checksum-Sha1:${SHA1_CHECKSUM}" \
+            --header "X-Checksum-Sha256:${SHA256_CHECKSUM}" \
+            --upload-file "$ARTIFACT_PATH" "$HELM_CHART_MUSEUM_URL/$(basename "$ARTIFACT_PATH")"
+          done
+          curl --request POST --user "$HELM_CHART_MUSEUM_USERNAME":"$HELM_CHART_MUSEUM_TOKEN" \
+                      "$HELM_CHART_MUSEUM_API_URL/helm/$HELM_CHART_MUSEUM_REPO/reindex"
+          # Ensure push was successful
+          helm repo add "$(basename "$HELM_CHART_MUSEUM_URL")" "$HELM_CHART_MUSEUM_URL" --username "$HELM_CHART_MUSEUM_USERNAME" --password "$HELM_CHART_MUSEUM_TOKEN"
+          helm repo update
+
+          # The Helm command returns 0 even when no results are found. Search for err str
+          # instead
+          HELM_SEARCH_RESULTS="$(helm search repo "$(basename "$HELM_CHART_MUSEUM_URL")")" # should list the uploaded charts
+          if [ "$HELM_SEARCH_RESULTS" == "No results found" ]; then
+            exitmsg "Error! Unable to find uploaded orc8r charts"
+          fi
+      - name: Only keep the last 20 chart uploaded versions
+        if: github.event.workflow.name == 'Push Helm Charts to Artifactory'
+        run: |
+          pip install artifactory
+          python ci-scripts/helm_repo_rotation.py

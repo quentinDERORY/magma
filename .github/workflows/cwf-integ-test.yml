@@ -1,20 +1,22 @@
 ---
 
-name: LTE integ test
+name: CWF integ test
 
 on:  # yamllint disable-line rule:truthy
   workflow_dispatch:
   push:
     branches:
       - master
+      - quentin-new-ci
 
 jobs:
-  lte-integ-test:
+  cwf-integ-test:
     runs-on: macos-10.15
     steps:
-      - run: echo "::set-output name=date::$(date +'%m-%d-%Y--%H-%M-%S')"
-        id: date
       - uses: actions/checkout@v2
+      - uses: docker-practice/actions-setup-docker@master
+        with:
+          docker_version: "20.10"
       - name: setup pyenv
         uses: "gabrielfalcao/pyenv-action@v8"
         with:
@@ -27,7 +29,11 @@ jobs:
           pip3 install --upgrade pip
           pip3 install ansible fabric3 jsonpickle requests PyYAML
           vagrant plugin install vagrant-vbguest vagrant-disksize
+      - name: Run docker compose
+        run: |
+          cd cwf/gateway/docker
+          docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.nginx.yml -f docker-compose.integ-test.yml build --force-rm  --parallel
       - name: Run the integ test
         run: |
-          cd lte/gateway
-          fab integ_test
+          cd cwf/gateway
+          fab integ_test:destroy_vm=True,transfer_images=True,test_result_xml=tests.xml
