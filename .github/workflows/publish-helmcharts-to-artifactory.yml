@@ -1,9 +1,20 @@
 ---
+# Need to refactor helm script to use versioning from charts themselves in release process
 name: "Push Helm Charts to Artifactory"
 
 on:  # yamllint disable-line rule:truthy
   push:
-    branches: [master, v1.*]  # Running on v1.* to tag official release
+    branches:
+      - master
+      - v1.*
+  pull_request:
+    branches:
+      - master
+      - v1.*
+    types:
+      - opened
+      - reopened
+      - synchronize
 jobs:
   build_publish_helm_charts:
     env:
@@ -18,27 +29,43 @@ jobs:
       # Version is github job run number when running on master
       # Or is branch name when on release branch
       - name: Set Helm chart version
+        env:
+          EVENT_NAME: "${{ github.event_name }}"
+          ISSUE_NUMBER: "${{ github.event.number }}"
         run: |
           if [ "${GITHUB_REF##*/}" = "master" ] ;then
             echo "VERSION=${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+          elif [ "${EVENT_NAME}" = "pull_request" ]; then
+            echo "test"
+            echo "VERSION=${ISSUE_NUMBER}" >> $GITHUB_ENV
+            echo ${ISSUE_NUMBER}
           fi
       - name: Launch build and publish script
         run: |
           if [ "${GITHUB_REF##*/}" = "master" ] ;then
             orc8r/tools/helm/package.sh --deployment-type all --version $VERSION
+          elif [ "${GITHUB_EVENT_NAME}" = "pull_request" ] ;then
+            mkdir charts
+            orc8r/tools/helm/package.sh --deployment-type all --version $VERSION --only-package
           else
             orc8r/tools/helm/package.sh --deployment-type all
           fi
+      - name: Upload charts as artifacts
+        uses: actions/upload-artifact@v2
+        if: github.event.name == 'pull_request'
+        with:
+          name: helm-charts
+          path: charts
       - name: Extract commit title
         id: commit
-        if: failure()
+        if: failure() && github.event.name == 'push'
         run: |
           str="$(jq '.head_commit.message' $GITHUB_EVENT_PATH)"    # get the head_commit message
           echo ::set-output name=title::${str%%\\n*} | tr -d '"'
       # Notify ci channel when failing
       # Plugin info: https://github.com/marketplace/actions/slack-notify
       - name: Notify failure to slack
-        if: failure()
+        if: failure() && github.event_name == 'push'
         uses: rtCamp/action-slack-notify@v2.2.0
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_CI }}
@@ -49,6 +76,7 @@ jobs:
           SLACK_COLOR: "#FF0000"
           SLACK_FOOTER: ' '
       - name: Only keep the last 20 uploaded versions
+        if: github.event.name == 'push'
         run: |
           pip install artifactory
           python ci-scripts/helm_repo_rotation.py

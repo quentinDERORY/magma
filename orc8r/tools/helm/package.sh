@@ -29,18 +29,23 @@ update_and_send_to_artifactory () {
   # We want $VERSION to be split as this is an option to the helm command
   ARTIFACT_PATH="$(helm package "$CHART_PATH" $VERSION | awk '{print $8}')"
   helm repo index .
-  MD5_CHECKSUM="$(md5sum "$ARTIFACT_PATH" | awk '{print $1}')"
-  SHA1_CHECKSUM="$(shasum -a 1 "$ARTIFACT_PATH" | awk '{ print $1 }')"
-  SHA256_CHECKSUM="$(shasum -a 256 "$ARTIFACT_PATH" | awk '{ print $1 }')"
-  curl --user "$HELM_CHART_MUSEUM_USERNAME":"$HELM_CHART_MUSEUM_TOKEN" --fail \
-              --header "X-Checksum-MD5:${MD5_CHECKSUM}" \
-              --header "X-Checksum-Sha1:${SHA1_CHECKSUM}" \
-              --header "X-Checksum-Sha256:${SHA256_CHECKSUM}" \
-              --upload-file "$ARTIFACT_PATH" "$HELM_CHART_MUSEUM_URL/$(basename "$ARTIFACT_PATH")"
+
+  if [[ $ONLY_PACKAGE = "True" ]]; then
+    mv $ARTIFACT_PATH $MAGMA_ROOT/charts
+  else
+    MD5_CHECKSUM="$(md5sum "$ARTIFACT_PATH" | awk '{print $1}')"
+    SHA1_CHECKSUM="$(shasum -a 1 "$ARTIFACT_PATH" | awk '{ print $1 }')"
+    SHA256_CHECKSUM="$(shasum -a 256 "$ARTIFACT_PATH" | awk '{ print $1 }')"
+    curl --user "$HELM_CHART_MUSEUM_USERNAME":"$HELM_CHART_MUSEUM_TOKEN" --fail \
+                --header "X-Checksum-MD5:${MD5_CHECKSUM}" \
+                --header "X-Checksum-Sha1:${SHA1_CHECKSUM}" \
+                --header "X-Checksum-Sha256:${SHA256_CHECKSUM}" \
+                --upload-file "$ARTIFACT_PATH" "$HELM_CHART_MUSEUM_URL/$(basename "$ARTIFACT_PATH")"
+  fi
 }
 
 usage() {
-  echo "Usage: $0 [-v|--version V] [-d|--deployment-type $FWA|$FFWA|$ALL]"
+  echo "Usage: $0 [-v|--version V] [-d|--deployment-type $FWA|$FFWA|$ALL] [-p|--only-package]"
   exit 2
 }
 
@@ -60,6 +65,11 @@ case $key in
     ;;
     -d|--deployment-type)
     DEPLOYMENT_TYPE="$2"
+    shift
+    ;;
+    -p|--only-package)
+    # Only when pushing to artifactory
+    ONLY_PACKAGE="True"
     shift
     ;;
     -h|--help)
