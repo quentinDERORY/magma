@@ -1,0 +1,68 @@
+---
+
+name: CWF integ test
+
+on:  # yamllint disable-line rule:truthy
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - quentin-new-ci
+
+jobs:
+  cwf-integ-test:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker-practice/actions-setup-docker@master
+        with:
+          docker_version: "20.10"
+      - name: setup pyenv
+        uses: "gabrielfalcao/pyenv-action@v8"
+        with:
+          default: 3.8.5
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8.5'
+      - name: Install pre requisites
+        run: |
+          pip3 install --upgrade pip
+          pip3 install ansible fabric3 jsonpickle requests PyYAML docker-compose
+          vagrant plugin install vagrant-vbguest vagrant-disksize
+      - name: Run docker compose
+        timeout-minutes: 20
+        run: |
+          cd cwf/gateway/docker
+          docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.nginx.yml -f docker-compose.integ-test.yml build --force-rm  --parallel
+      - name: Run the integ test
+        run: |
+          cd cwf/gateway
+          fab integ_test:destroy_vm=True,transfer_images=True,test_result_xml=tests.xml
+      - name: upload test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: tests.xml
+      - name: Publish Unit Test Results
+        if: failure() && github.event_name == 'push'
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        with:
+          files: tests.xml
+      - name: Extract commit title
+        # yamllint enable
+        if: failure() && github.event_name == 'push'
+        id: commit
+        run: |
+          str="$(jq '.head_commit.message' $GITHUB_EVENT_PATH)"    # get the head_commit message
+          echo ::set-output name=title::${str%%\\n*} | tr -d '"'
+      - name: Notify failure to slack
+        if: failure() && github.event_name == 'push'
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_CI }}
+          SLACK_TITLE: "CWF integration test test failed"
+          SLACK_USERNAME: "CWF integ test"
+          SLACK_MESSAGE: "${{ steps.commit.outputs.title}}"
+          SLACK_ICON_EMOJI: ":boom:"
+          SLACK_COLOR: "#FF0000"
+          SLACK_FOOTER: ' '

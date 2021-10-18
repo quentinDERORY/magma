@@ -3,6 +3,7 @@
 name: LTE integ test
 
 on:  # yamllint disable-line rule:truthy
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -29,5 +30,20 @@ jobs:
       - name: Run the integ test
         run: |
           cd lte/gateway
-          sed -i '' 's/1.1.20210928/1.1.20210618/' Vagrantfile
           fab integ_test
+      - name: Get test results
+        if: always()
+        run: |
+          fab get_test_summaries:dst_path="test-results"
+          ls -R
+      - name: upload test results
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: test-results
+          path: test-results
+      - name: Publish Unit Test Results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        with:
+          files: test-results/**/*.xml
