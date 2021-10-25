@@ -255,7 +255,7 @@ def integ_test(
         gateway_ip = gateway_host.split('@')[1].split(':')[0]
 
     execute(_dist_upgrade)
-    execute(_build_magma)
+    #execute(_build_magma)
     execute(_run_sudo_python_unit_tests)
     execute(_start_gateway)
 

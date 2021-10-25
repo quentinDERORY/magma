@@ -17,6 +17,24 @@
   tags:
     - agwc
 
+- name: Update and upgrade apt packages
+  become: yes
+  apt:
+    update_cache: yes
+  tags:
+    - agwc
+
+- name: Update ca-certs
+  become: yes
+  apt:
+    name: ca-certificates
+  tags:
+    - agwc
+
+- name: Trigger update of CA certs
+  ignore_errors: true
+  become: true
+  command: update-ca-certificates
 - name: Configuring private package manager.
   copy:
     content: >
@@ -77,7 +95,6 @@
       - openssl
       - dkms
       - uuid-runtime
-      - ca-certificates
   tags:
     - agwc
 

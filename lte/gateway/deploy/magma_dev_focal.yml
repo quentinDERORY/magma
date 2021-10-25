@@ -50,6 +50,12 @@
         magma_deps: /home/{{ ansible_user }}/magma-deps
     - role: fluent_bit
     - role: pyvenv
+    - role: magma_deploy
+      vars:
+        magma_pkgrepo_proto: https
+        magma_pkgrepo_host: artifactory.magmacore.org/artifactory/debian
+        magma_pkgrepo_path: ""
+        magma_pkgrepo_dist: focal-1.6.0
 
   tasks:
     # Only run installation for docker

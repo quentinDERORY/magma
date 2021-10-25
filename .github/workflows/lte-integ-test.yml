@@ -7,6 +7,7 @@ on:  # yamllint disable-line rule:truthy
   push:
     branches:
       - master
+      - quentin-lte-fast
 
 jobs:
   lte-integ-test:
