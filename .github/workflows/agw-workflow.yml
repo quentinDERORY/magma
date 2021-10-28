@@ -499,7 +499,7 @@ jobs:
         if: failure() && github.event_name == 'push'
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_USERNAME: "Github action agw build failed"
+          SLACK_USERNAME: "Github actssion agw build failed"
           SLACK_AVATAR: ":boom:"
         uses: Ilshidur/action-slack@2.1.0
         with:
