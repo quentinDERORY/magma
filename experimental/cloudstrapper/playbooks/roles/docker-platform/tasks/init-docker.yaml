@@ -1,0 +1,4 @@
+---
+
+- name: Call init script
+  command: "/opt/magma/lte/gateway/deploy/agw_install_docker.sh base"

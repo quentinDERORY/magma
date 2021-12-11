@@ -4,8 +4,6 @@
   roles:
     - { role: ghz-platform, tags: platform }
   vars_files:
-    - roles/vars/defaults.yaml
-    - roles/vars/cluster.yaml
     - "{{ dirLocalInventory }}/secrets.yaml"
   environment:
     AWS_ACCESS_KEY_ID: "{{ awsAccessKey }}"

@@ -1,0 +1,3 @@
+MAGMA_ROOT: /opt/magma
+tag: latest
+magmaRepo: /opt/magma

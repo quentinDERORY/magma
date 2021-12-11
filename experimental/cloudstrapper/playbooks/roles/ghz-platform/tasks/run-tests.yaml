@@ -7,15 +7,23 @@
     - "{{ load_tests | map(attribute='name') | list }}"
 
 - name: run load test script
-  command: "python3 loadtest_{{ item.0.name }}.py {{ item.1.name }}"
+  command:
+    cmd: "python3 $MAGMA_ROOT/lte/gateway/python/load_tests/loadtest_{{ item.0.name }}.py {{ item.1.name }} --import-path $MAGMA_ROOT/lte/protos/"
+    chdir: "$MAGMA_ROOT/lte/gateway/python/load_tests"
   delegate_to: "{{ item.0.name }}"
+  environment:
+    MAGMA_ROOT: "{{MAGMA_ROOT}}"
   with_subelements:
     - "{{ load_tests }}"
     - test
 
 - name: Check that the load test result file exists
-  command: "cat result_{{ item.1.result }}.json chdir=/var/tmp"
+  command:
+    cmd: "cat result_{{ item.1.result }}.json"
+    chdir: "/var/tmp"
   register: json_output
+  environment:
+    MAGMA_ROOT: "{{MAGMA_ROOT}}"
   delegate_to: "{{ item.0.name }}"
   with_subelements:
     - "{{ load_tests }}"
