@@ -187,6 +187,7 @@ jobs:
       - name: Launch ec2 instance
         run: |
           ansible-playbook ${{ env.WORK_DIR }}/docker-ami-provision.yaml -e "dirLocalInventory=${{ env.VARS_DIR }}"  -e "tag_host=dockerami"   -e "awsAgwRegion=us-east-1"
+          sleep 60s
       - name: Install needed components on the remote host
         run: |
           ansible-playbook ${{ env.WORK_DIR }}/docker-ami-configure.yaml -e "dirLocalInventory=${{ env.VARS_DIR }}" -e "dockerHost=tag_agw_dockerami" -e "awsAgwRegion=us-east-1"  -i ${{ env.VARS_DIR }}/common_instance_aws_ec2.yaml -u ubuntu

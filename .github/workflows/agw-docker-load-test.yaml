@@ -1,5 +1,5 @@
 ---
-name: docker-ami
+name: AGW docker load test
 
 on:  # yamllint disable-line rule:truthy
   push:
@@ -46,6 +46,7 @@ jobs:
       - name: Launch the docker ami in aws
         run: |
           ansible-playbook ${{ env.WORK_DIR }}/docker-ami-provision.yaml -e "dirLocalInventory=${{ env.VARS_DIR }}" -e "image=${{env.AGW_DOCKER_AMI}}" -e "tag_host=dockerloadtest"  -e "awsAgwRegion=us-east-1"
+          sleep 60s
       - name: Launch the load test
         run: |
           ansible-playbook ${{ env.WORK_DIR }}/ghz-run-remote.yaml -e "dirLocalInventory=${{ env.VARS_DIR }}" -e "dockerHost=tag_agw_dockerloadtest"  -e "awsAgwRegion=us-east-1" -i ${{ env.VARS_DIR }}/common_instance_aws_ec2.yaml -u ubuntu -e "tag=${SHA:0:8}"
