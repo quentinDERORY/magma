@@ -7,7 +7,7 @@ on:  # yamllint disable-line rule:truthy
     - cron: "0 2 * * 0"
   push:
     branches:
-      -quentin-snapshot-docker-base-agw
+      - quentin-snapshot-docker-base-agw
 
 env:
   MAGMA_VERSION: "1.7.0"
