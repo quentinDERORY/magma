@@ -19,12 +19,12 @@
     - "{{ ec2_node_info.instances }}"
 
 - name: find key by tag
-  command: aws ec2 describe-key-pairs --key-names "dockerAMI"  --filters "Name=tag:agw,Values="docker"" --query 'KeyPairs[0].KeyName' --output text
+  command: aws ec2 describe-key-pairs --key-names "{{ tag_host }}" --filters "Name=tag:agw,Values="docker"" --query 'KeyPairs[0].KeyName' --region "{{ awsAgwRegion }}" --output text
   register: keyFound
   ignore_errors: true
 
 - name: Delete Key
   ec2_key:
-    name: "dockerAMI"
+    name: "{{ tag_host }}"
     state: absent
   when: keyFound.stdout == 'dockerAMI'

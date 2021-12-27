@@ -1,17 +1,17 @@
 - name: allocate key
   ec2_key:
-    name: "dockerAMI"
+    name: "{{keyName}}"
   register: key_val
 
 - name: find key id
-  command: aws ec2 describe-key-pairs --key-names "dockerAMI" --query 'KeyPairs[0].KeyPairId' --output text
+  command: aws ec2 describe-key-pairs --key-names "{{keyName}}" --query 'KeyPairs[0].KeyPairId' --output text --region {{ awsAgwRegion }}
   register: key_id
 
 - name: Tag key
   ec2_tag:
     resource: "{{ key_id.stdout }}"
     tags:
-      agw: "docker"
+      agw: "{{tag_host}}"
 
 - name: copy .pem file
   copy:
