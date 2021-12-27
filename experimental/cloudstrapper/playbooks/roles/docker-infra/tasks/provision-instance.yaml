@@ -15,7 +15,6 @@
     aws_access_key: "{{awsAccessKey}}"
     aws_secret_key: "{{awsSecretKey}}"
     key_name: "dockerAMI"
-    id: "{{ host_id }}"
     group_id: "{{ factSecGroup }}"
     image: "{{ image }}"
     instance_type: t2.micro

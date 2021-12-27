@@ -178,7 +178,7 @@ jobs:
           python-version: '3.7'
       - name: Install Dependencies
         run: |
-          pip install ansible awscli boto3
+          pip install ansible awscli boto3 boto
           sudo apt-get update
       - name: Export AWS Credentials
         run: |

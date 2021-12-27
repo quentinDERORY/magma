@@ -2,6 +2,7 @@
 
 - name: Gather information about instances
   ec2_instance_info:
+    region: "{{ awsAgwRegion }}"
     filters:
       "tag:agw": "{{ tag_host }}"
   register: ec2_node_info
