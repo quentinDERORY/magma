@@ -5,6 +5,9 @@ on:  # yamllint disable-line rule:truthy
   workflow_dispatch:
   schedule:
     - cron: "0 2 * * 0"
+  push:
+    branches:
+      -quentin-snapshot-docker-base-agw
 
 env:
   MAGMA_VERSION: "1.7.0"
@@ -13,6 +16,7 @@ jobs:
   publish-amis-to-marketplace:
     name: publish-amis-to-marketplace job
     runs-on: ubuntu-latest
+    if: github.event_name != 'push'
     env:
       MAGMA_ROOT: "${{ github.workspace }}"
       CODE_DIR: "${{ github.workspace }}/experimental/cloudstrapper"
@@ -154,7 +158,7 @@ jobs:
   publish-docker-ami:
     name: publish-docker-ami
     runs-on: ubuntu-latest
-    if: github.event_name == 'schedule'
+    if: github.event_name == 'push'
     env:
       MAGMA_ROOT: "${{ github.workspace }}"
       CODE_DIR: "${{ github.workspace }}/experimental/cloudstrapper"
