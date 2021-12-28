@@ -46,10 +46,13 @@ jobs:
       - name: Launch the docker ami in aws
         run: |
           ansible-playbook ${{ env.WORK_DIR }}/docker-ami-provision.yaml -e "dirLocalInventory=${{ env.VARS_DIR }}" -e "image=${{env.AGW_DOCKER_AMI}}" -e "tag_host=dockerloadtest"  -e "awsAgwRegion=us-east-1"
-          sleep 60s
+          sleep 120s
+          ls -R ${{ env.VARS_DIR }}
       - name: Launch the load test
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
         run: |
-          ansible-playbook ${{ env.WORK_DIR }}/ghz-run-remote.yaml -e "dirLocalInventory=${{ env.VARS_DIR }}" -e "dockerHost=tag_agw_dockerloadtest"  -e "awsAgwRegion=us-east-1" -i ${{ env.VARS_DIR }}/common_instance_aws_ec2.yaml -u ubuntu -e "tag=${SHA:0:8}"
+          ansible-playbook ${{ env.WORK_DIR }}/ghz-run-remote.yaml -e "dirLocalInventory=${{ env.VARS_DIR }}" --key-file "${{ env.VARS_DIR }}/dockerAMI.pem" -e "dockerHost=tag_agw_dockerloadtest"  -e "awsAgwRegion=us-east-1" -i ${{ env.VARS_DIR }}/common_instance_aws_ec2.yaml -u ubuntu -e "tag=${SHA:0:8}"
       - name: Terminate instance
         if: always()
         run: |

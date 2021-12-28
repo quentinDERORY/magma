@@ -19,7 +19,9 @@
     - "{{ ec2_node_info.instances }}"
 
 - name: find key by tag
-  command: aws ec2 describe-key-pairs --key-names "{{ tag_host }}" --filters "Name=tag:agw,Values="docker"" --query 'KeyPairs[0].KeyName' --region "{{ awsAgwRegion }}" --output text
+  command: aws ec2 describe-key-pairs --key-names "{{ tag_host }}" --filters "Name=tag:agw,Values="{{ tag_host }}"" --query 'KeyPairs[0].KeyName' --output text
+  environment:
+    AWS_DEFAULT_REGION: "{{ awsAgwRegion }}"
   register: keyFound
   ignore_errors: true
 
@@ -27,4 +29,5 @@
   ec2_key:
     name: "{{ tag_host }}"
     state: absent
-  when: keyFound.stdout == 'dockerAMI'
+    region: "{{ awsAgwRegion }}"
+  when: keyFound.stdout == tag_host

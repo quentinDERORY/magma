@@ -1,4 +1,7 @@
 ---
 
 - name: Call init script
+  become: true
+  environment:
+    MAGMA_VERSION: "{{buildMagmaVersion}}"
   command: "/opt/magma/lte/gateway/deploy/agw_install_docker.sh base"
