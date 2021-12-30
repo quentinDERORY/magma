@@ -7,7 +7,7 @@ on:  # yamllint disable-line rule:truthy
       workflows:
         - build-all
       branches:
-        - master
+        - master1
         - v1.*
       types:
         - completed
