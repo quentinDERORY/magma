@@ -5,3 +5,8 @@
   environment:
     MAGMA_VERSION: "{{buildMagmaVersion}}"
   command: "/opt/magma/lte/gateway/deploy/agw_install_docker.sh base"
+  register: initResult
+  until: initResult.finished
+  retries: 5
+  delay: 10
+  timeout: 300
