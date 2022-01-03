@@ -7,7 +7,7 @@ on:  # yamllint disable-line rule:truthy
       workflows:
         - build-all
       branches:
-        - master1
+        - master
         - v1.*
       types:
         - completed
@@ -22,7 +22,7 @@ jobs:
       CODE_DIR: "${{ github.workspace }}/experimental/cloudstrapper"
       VARS_DIR: "${{ github.workspace }}/experimental/cloudstrapper/playbooks/roles/vars"
       WORK_DIR: "${{ github.workspace }}/experimental/cloudstrapper/playbooks"
-      AGW_DOCKER_AMI: "ami-0979b7420bd7f8ace"
+      AGW_DOCKER_AMI: "ami-06edad1c2910ac0a6"
     steps:
       - uses: actions/checkout@v2
       - name: Run apt
