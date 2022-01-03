@@ -2,15 +2,15 @@
 name: AGW docker load test
 
 on:  # yamllint disable-line rule:truthy
-  push:
-    workflow_run:
-      workflows:
-        - build-all
-      branches:
-        - master
-        - v1.*
-      types:
-        - completed
+  workflow_run:
+    workflows:
+      - build-all
+    branches:
+      - quentin-snapshot-docker-base-agw
+      - master
+      - v1.*
+    types:
+      - completed
 
 jobs:
   docker-load-test:
