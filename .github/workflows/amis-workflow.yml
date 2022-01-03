@@ -193,10 +193,10 @@ jobs:
         env:
           ANSIBLE_HOST_KEY_CHECKING: False
         run: |
-          ansible-playbook ${{ env.WORK_DIR }}/docker-ami-configure.yaml --key-file "${{ env.VARS_DIR }}/dockerAMI.pem" -e "buildMagmaVersion=${{env.SHA}}" -e "dirLocalInventory=${{ env.VARS_DIR }}" -e "dockerHost=tag_agw_dockerami" -e "awsAgwRegion=us-east-1"  -i ${{ env.VARS_DIR }}/common_instance_aws_ec2.yaml -u ubuntu -vv
+          ansible-playbook ${{ env.WORK_DIR }}/docker-ami-configure.yaml --key-file "${{ env.VARS_DIR }}/dockerAMI.pem" -e "buildMagmaVersion=${{env.SHA}}" -e "dirLocalInventory=${{ env.VARS_DIR }}" -e "dockerHost=tag_agw_dockerami" -e "awsAgwRegion=us-east-1"  -i ${{ env.VARS_DIR }}/common_instance_aws_ec2.yaml -u ubuntu
       - name: Snapshot the instance
         run: |
-          ansible-playbook ${{ env.WORK_DIR }}/docker-ami-init.yaml -e "dirLocalInventory=${{ env.VARS_DIR }}"  -e "awsAgwRegion=us-east-1"  -e "tag_host=dockerami" -e "taggedVersion=${{ env.MAGMA_VERSION }}-${SHA:0:8}"
+          ansible-playbook ${{ env.WORK_DIR }}/docker-ami-init.yaml -e "dirLocalInventory=${{ env.VARS_DIR }}"  -e "awsAgwRegion=us-east-1"  -e "tag_host=dockerami" -e "taggedVersion=${{ env.MAGMA_VERSION }}-${SHA:0:8}" -vv
       - name: Terminate instance
         if: always()
         run: |

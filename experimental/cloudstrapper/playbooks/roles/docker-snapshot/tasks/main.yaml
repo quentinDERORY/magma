@@ -15,7 +15,7 @@
   ec2_ami:
     instance_id: "{{ factIid }}"
     wait: yes
-    name: "{{ dockerAmiName}}"taggedVersion
+    name: "{{ dockerAmiName}}-{{ taggedVersion }}"
     tags:
       Name: "{{ dockerAmiName }}-{{ taggedVersion }}"
       Service: DockerAgwAMI
