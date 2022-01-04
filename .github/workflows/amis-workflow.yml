@@ -5,7 +5,6 @@ on:  # yamllint disable-line rule:truthy
   workflow_dispatch:
   schedule:
     - cron: "0 2 * * 0"
-  push:
 
 env:
   MAGMA_VERSION: "1.7.0"

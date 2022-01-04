@@ -2,6 +2,7 @@
 name: AGW docker load test
 
 on:  # yamllint disable-line rule:truthy
+  push:
   workflow_run:
     workflows:
       - build-all
@@ -21,7 +22,7 @@ jobs:
       CODE_DIR: "${{ github.workspace }}/experimental/cloudstrapper"
       VARS_DIR: "${{ github.workspace }}/experimental/cloudstrapper/playbooks/roles/vars"
       WORK_DIR: "${{ github.workspace }}/experimental/cloudstrapper/playbooks"
-      AGW_DOCKER_AMI: "ami-0017ce6bf6ce1f58c"
+      AGW_DOCKER_AMI: "ami-0af250a68d301d520"
     steps:
       - uses: actions/checkout@v2
       - name: Run apt
