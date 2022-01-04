@@ -8,11 +8,9 @@
 
 - name: run load test script
   command:
-    cmd: "python3 $MAGMA_ROOT/lte/gateway/python/load_tests/loadtest_{{ item.0.name }}.py {{ item.1.name }} --import-path $MAGMA_ROOT/lte/protos/"
-    chdir: "$MAGMA_ROOT/lte/gateway/python/load_tests"
+    cmd: "python3 /magma/lte/gateway/python/load_tests/loadtest_{{ item.0.name }}.py {{ item.1.name }} --import-path /magma/lte/protos/"
+    chdir: "/magma/lte/gateway/python/load_tests"
   delegate_to: "{{ item.0.name }}"
-  environment:
-    MAGMA_ROOT: "{{MAGMA_ROOT}}"
   with_subelements:
     - "{{ load_tests }}"
     - test
@@ -23,7 +21,7 @@
     chdir: "/var/tmp"
   register: json_output
   environment:
-    MAGMA_ROOT: "{{MAGMA_ROOT}}"
+    MAGMA_ROOT: "/magma"
   delegate_to: "{{ item.0.name }}"
   with_subelements:
     - "{{ load_tests }}"
