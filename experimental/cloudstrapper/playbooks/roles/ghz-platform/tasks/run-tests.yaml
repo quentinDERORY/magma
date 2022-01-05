@@ -10,6 +10,8 @@
   command:
     cmd: "python3 /magma/lte/gateway/python/load_tests/loadtest_{{ item.0.name }}.py {{ item.1.name }} --import-path /magma/lte/protos/"
     chdir: "/magma/lte/gateway/python/load_tests"
+  environment:
+    MAGMA_ROOT: "/magma"
   delegate_to: "{{ item.0.name }}"
   with_subelements:
     - "{{ load_tests }}"

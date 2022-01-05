@@ -52,7 +52,7 @@ jobs:
         env:
           ANSIBLE_HOST_KEY_CHECKING: False
         run: |
-          ansible-playbook ${{ env.WORK_DIR }}/ghz-run-remote.yaml -e "dirLocalInventory=${{ env.VARS_DIR }}" --key-file "${{ env.VARS_DIR }}/dockerAMI.pem" -e "dockerHost=tag_agw_dockerloadtest"  -e "awsAgwRegion=us-east-1" -i ${{ env.VARS_DIR }}/common_instance_aws_ec2.yaml -u ubuntu
+          ansible-playbook ${{ env.WORK_DIR }}/ghz-run-remote.yaml -e "dirLocalInventory=${{ env.VARS_DIR }}" --key-file "${{ env.VARS_DIR }}/dockerAMI.pem" -e "dockerHost=tag_agw_dockerloadtest"  -e "awsAgwRegion=us-east-1" -i ${{ env.VARS_DIR }}/common_instance_aws_ec2.yaml -u ubuntu -e tag=2bc6732c
       - name: Terminate instance
         if: always()
         run: |
