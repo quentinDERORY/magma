@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eux
 ################################################################################
 # Copyright 2020 The Magma Authors.
 
@@ -12,26 +12,25 @@
 # limitations under the License.
 ################################################################################
 
-set -e
+# Add ubuntu user to sudoers.
+echo "ubuntu        ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers
+echo "vagrant        ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers
+sed -i "s/^.*requiretty/#Defaults requiretty/" /etc/sudoers
 
-# Packer may ssh into the box too early since SSH is ready before Debian
-# actually is
-sleep 30
+# Disable daily apt unattended updates.
+echo 'APT::Periodic::Enable "0";' >> /etc/apt/apt.conf.d/10periodic
 
-# Adding the snapshot to retrieve 4.9.0-9-amd64, install the kernel, then
-# remove this snapshot
-echo "deb http://snapshot.debian.org/archive/debian/20190801T025637Z stretch main non-free contrib" >> /etc/apt/sources.list
-apt-get update
-apt install -y linux-image-4.9.0-9-amd64 linux-headers-4.9.0-9-amd64
-sed -i '/20190801T025637Z/d' /etc/apt/sources.list
+apt update
+apt install -y ansible
 
 # Install some packages
 apt-get update
 apt-get install -y openssh-server gcc rsync dirmngr
 apt-get install -y apt-transport-https ca-certificates
 
-# Add the Etagecom magma repo
-bash -c 'echo -e "deb https://artifactory.magmacore.org/artifactory/debian-test stretch-1.5.0 main" > /etc/apt/sources.list.d/packages_magma_etagecom_io.list'
+# Add the artifactory magma repo
+bash -c 'echo -e "deb https://artifactory.magmacore.org/artifactory/debian focal-1.6.0 main" > /etc/apt/sources.list.d/packages_magma_etagecom_io.list'
+
 
 # Create the preferences file for backports
 bash -c 'cat <<EOF > /etc/apt/preferences.d/magma-preferences
@@ -44,12 +43,3 @@ EOF'
 wget https://artifactory.magmacore.org:443/artifactory/api/gpg/key/public -O /tmp/public
 apt-key add /tmp/public
 apt-get update
-
-# Disable daily auto updates, so that vagrant ansible scripts can
-# acquire apt lock immediately on startup
-systemctl stop apt-daily.timer
-systemctl disable apt-daily.timer
-systemctl disable apt-daily.service
-systemctl daemon-reload
-
-echo "Done"

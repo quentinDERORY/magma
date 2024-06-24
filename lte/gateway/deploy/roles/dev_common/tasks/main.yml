@@ -261,9 +261,21 @@
   retries: 5
   when: preburn
 
+- name: Install Debian Magma gateway dev dependencies
+  retries: 5
+  when: preburn and ansible_distribution == "Debian"
+  apt:
+    state: present
+    update_cache: no
+    pkg:
+      - libprotobuf10
+      - libprotobuf-lite10
+      - libprotoc10
+      - libssl1.0-dev
+
 - name: Install Ubuntu Magma gateway dev dependencies
   retries: 5
-  when: preburn
+  when: preburn and ansible_distribution == "Ubuntu"
   apt:
     state: present
     update_cache: no
@@ -313,20 +325,20 @@
   get_url:
     url: "https://github.com/getsentry/sentry-native/releases/download/{{ sentry_native_version }}/sentry-native.zip"
     dest: "{{ tmp_directory }}/sentry-native.zip"
-  when: preburn
+  when: preburn and ansible_distribution == "Ubuntu"
 
 - name: Create a directory for Sentry Native
   file:
     path: "{{ tmp_directory }}/sentry-native"
     state: directory
-  when: preburn
+  when: preburn and ansible_distribution == "Ubuntu"
 
 - name: Unpack Sentry Native SDK
   unarchive:
     src: "{{ tmp_directory }}/sentry-native.zip"
     dest: "{{ tmp_directory }}/sentry-native"
     remote_src: yes
-  when: preburn
+  when: preburn and ansible_distribution == "Ubuntu"
 
 - name: Build and Install Sentry Native SDK
   shell: |
@@ -335,7 +347,7 @@
     cmake --build build --parallel && \
     cmake --install build --prefix install --config RelWithDebInfo && \
     cd build && make install
-  when: preburn
+  when: preburn and ansible_distribution == "Ubuntu"
 
 ###############################################
 # Download and build swagger-codegen
@@ -415,6 +427,11 @@
     state: directory
     mode: 0777
 
+- name: Create the file
+  command: touch /etc/multipath.conf
+  become: yes
+  ignore_errors: true
+
 - name: Patch multipath conf
   when: preburn
   patch:
@@ -428,6 +445,15 @@
     src: magma_interfaces
     dest: /etc/network/interfaces
   when: preburn
+  ignore_errors: true
+
+
+- name: Copy Interface file.
+  copy:
+    src: magma_interfaces
+    dest: /etc/network/interfaces
+  when: preburn
+  become: yes
 
 - name: Remove netplan and enable networking.
   shell: |

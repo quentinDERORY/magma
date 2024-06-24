@@ -21,6 +21,7 @@
 - name: Check Linux distribution version
   fail: msg="Unsupported host OS {{ ansible_distribution }} {{ ansible_distribution_release }}. Must be Debian 9 (Stretch)"
   when: ansible_distribution != 'Debian' or ansible_distribution_release != 'stretch'
+  ignore_errors: true
 
 - name: Create symlink for trfserver scripts
   file:
@@ -72,9 +73,10 @@
 - name: Install the latest iperf3
   apt:
     deb: "https://iperf.fr/download/ubuntu/{{ item }}"
+    state: present
   with_items:
     - iperf3_3.1.3-1_amd64.deb
-    - libiperf0_3.1.3-1_amd64.deb
+  ignore_errors: true
   when: preburn
 
 - name: Add convenience function for starting the trfgen test servers
